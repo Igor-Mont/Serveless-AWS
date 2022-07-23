@@ -5,11 +5,11 @@ import { Construct } from 'constructs'
 
 export class ProductsAppStack extends cdk.Stack {
   readonly productsFetchHandler: lambdaNodeJS.NodejsFunction
-  readonly productsDbd: dynamodb.Table
+  readonly productsDdb: dynamodb.Table
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
-    this.productsDbd = new dynamodb.Table(this, "ProductsDbd", {
+    this.productsDdb = new dynamodb.Table(this, "ProductsDdb", {
       tableName: "products",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       partitionKey: {
@@ -30,7 +30,12 @@ export class ProductsAppStack extends cdk.Stack {
       bundling: {
         minify: true,
         sourceMap: false
+      },
+      environment: {
+        PRODUCTS_DDB
       }
     })
+
+    this.productsDdb.grantReadData(this.productsFetchHandler)
   }
 }
